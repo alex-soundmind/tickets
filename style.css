@@ -1,0 +1,182 @@
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&display=swap');
+
+:root {
+  --bg-color: #1e1e2f;
+  --card-color: #2a2a40;
+  --accent-color: #ff6b6b;
+  --accent-hover: #ff8787;
+  --text-color: #f1f1f1;
+  --muted-text: #a0a0b2;
+  --border-radius: 12px;
+  --shadow: 4px 4px 10px rgba(0, 0, 0, 0.5), -4px -4px 10px rgba(255, 255, 255, 0.05);
+}
+
+body {
+  font-family: 'Figtree', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  background: linear-gradient(90deg, #3a3a5a, #2a2a40);
+  padding: 1.5rem 2rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: var(--accent-color);
+}
+
+nav {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+nav a {
+  color: var(--muted-text);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  transition: all 0.3s ease;
+}
+
+nav a:hover,
+nav a.active {
+  background-color: var(--accent-color);
+  color: #fff;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--card-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  border-left: 4px solid var(--accent-color);
+  padding-left: 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+}
+
+th, td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #3a3a5a;
+}
+
+th {
+  color: var(--muted-text);
+  font-weight: 600;
+}
+
+tr:hover {
+  background-color: #34344a;
+}
+
+.actions a {
+  margin-right: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-color);
+  transition: color 0.3s;
+}
+
+.actions a:hover {
+  color: var(--accent-hover);
+}
+
+button,
+input[type="submit"] {
+  background-color: var(--accent-color);
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover,
+input[type="submit"]:hover {
+  background-color: var(--accent-hover);
+}
+
+button.danger {
+  background-color: #e03131;
+}
+button.danger:hover {
+  background-color: #c92a2a;
+}
+
+form {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+
+form label {
+  font-weight: 600;
+  color: var(--muted-text);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+textarea {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #1a1a2b;
+  border: 1px solid #3a3a5a;
+  border-radius: var(--border-radius);
+  color: var(--text-color);
+  font-size: 1rem;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-start;
+}
+
+.error {
+  background-color: #e03131;
+  color: white;
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  text-align: center;
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+  background-color: #2a2a40;
+  color: var(--muted-text);
+  margin-top: auto;
+}
