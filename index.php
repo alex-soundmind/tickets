@@ -95,15 +95,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_logged_in) {
         continue;
     }
 
-    // JSONB (проверка на валидный JSON)
-    if ($col === 'seats') {
-        json_decode($value);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            $errors[] = "Поле '" . translate($col) . "' должно быть валидным JSON.";
-            continue;
-        }
-    }
-
     $data[$col] = $value;
 }
 
@@ -217,7 +208,7 @@ if ($action === 'delete' && $id && $is_logged_in) {
             }
             ?>
             <h2><?= $action === 'create' ? 'Добавление записи' : 'Редактирование записи' ?></h2>
-            <form method="post" action="?table=<?= $table ?>&action=<?= $action ?><?= $id ? '&id='.$id : '' ?>">
+            <form id="data-form" method="post" action="?table=<?= $table ?>&action=<?= $action ?><?= $id ? '&id='.$id : '' ?>">
                 <?php foreach ($columns as $col):
                     if ($col === $pk) continue;
                     $val = $values[$col] ?? '';
@@ -240,7 +231,7 @@ if ($action === 'delete' && $id && $is_logged_in) {
                 <?php endforeach; ?>
 
                 <div class="form-actions">
-                    <input type="submit" value="Сохранить">
+                    <input type="button" value="Сохранить" onclick="submitForm()">
                     <a href="?table=<?= $table ?>"><button type="button" class="danger">Отмена</button></a>
                 </div>
             </form>
@@ -260,5 +251,23 @@ if ($action === 'delete' && $id && $is_logged_in) {
             Пользователь: <b><?= htmlspecialchars($_SESSION['user']['name']) ?></b> | <a href="logout.php">Выйти</a>
         <?php endif; ?>
     </footer>
+    <script>
+        function submitForm() {
+            const form = document.getElementById('data-form');
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(html => {
+                document.body.innerHTML = html;
+            })
+            .catch(err => {
+                alert('Ошибка отправки формы: ' + err);
+            });
+        }
+        </script>
 </body>
 </html>
