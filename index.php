@@ -32,28 +32,81 @@ try {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_logged_in) {
     $data = [];
-    
+
     foreach ($columns as $col) {
-        if ($col === $pk) continue;
+    if ($col === $pk) continue;
 
-        $value = $_POST[$col] ?? '';
+    $value = $_POST[$col] ?? '';
 
-        if ($value === '') {
-            $errors[] = "Поле '" . translate($col) . "' не может быть пустым.";
-        }
-
-        if (str_ends_with($col, '_id') || in_array($col, ['experience'])) {
-            if (!filter_var($value, FILTER_VALIDATE_INT) && $value !== '') {
-                $errors[] = "Поле '" . translate($col) . "' должно быть целым числом.";
-            }
-        }
-        
-        if ($col === 'email' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
-            $errors[] = "Неверный формат E-mail.";
-        }
-
-        $data[$col] = $value === '' ? null : $value;
+    if ($value === '') {
+        $errors[] = "Поле '" . translate($col) . "' не может быть пустым.";
+        continue;
     }
+
+    // Проверка числовых полей
+    $numericFields = ['id', 'flight_id', 'passenger_id', 'ticket_price'];
+    if (in_array($col, $numericFields)) {
+        if (!is_numeric($value)) {
+            $errors[] = "Поле '" . translate($col) . "' должно быть числом.";
+            continue;
+        }
+    }
+
+    // Проверка текстовых полей на отсутствие цифр
+    $textFields = [
+        'departure_point', 'arrival_point',
+        'last_name', 'first_name', 'middle_name',
+        'document_type', 'document_issue_country'
+    ];
+    if (in_array($col, $textFields)) {
+        if (preg_match('/\d/', $value)) {
+            $errors[] = "Поле '" . translate($col) . "' должно содержать только текст без цифр.";
+            continue;
+        }
+    }
+
+    // Email
+    if ($col === 'email' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "Неверный формат E-mail.";
+        continue;
+    }
+
+    // Телефон
+    if ($col === 'phone_number' && !preg_match('/^\+?[0-9\- ]+$/', $value)) {
+        $errors[] = "Неверный формат номера телефона.";
+        continue;
+    }
+
+    // Дата
+    if (str_contains($col, 'date') && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+        $errors[] = "Поле '" . translate($col) . "' должно быть в формате YYYY-MM-DD.";
+        continue;
+    }
+
+    // Время
+    if ($col === 'departure_time' && !preg_match('/^\d{2}:\d{2}(:\d{2})?$/', $value)) {
+        $errors[] = "Поле '" . translate($col) . "' должно быть в формате HH:MM или HH:MM:SS.";
+        continue;
+    }
+
+    // Интервал
+    if ($col === 'flight_duration' && !preg_match('/^\d+\s+(hour|minute|second|day)s?$/i', $value)) {
+        $errors[] = "Поле '" . translate($col) . "' должно быть интервалом (например, '2 hours').";
+        continue;
+    }
+
+    // JSONB (проверка на валидный JSON)
+    if ($col === 'seats') {
+        json_decode($value);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $errors[] = "Поле '" . translate($col) . "' должно быть валидным JSON.";
+            continue;
+        }
+    }
+
+    $data[$col] = $value;
+}
+
 
     if (empty($errors)) {
         try {
@@ -166,11 +219,10 @@ if ($action === 'delete' && $id && $is_logged_in) {
             <h2><?= $action === 'create' ? 'Добавление записи' : 'Редактирование записи' ?></h2>
             <form method="post" action="?table=<?= $table ?>&action=<?= $action ?><?= $id ? '&id='.$id : '' ?>">
                 <?php foreach ($columns as $col):
-                    if ($col === $pk) continue; // Не показываем поле с первичным ключом
+                    if ($col === $pk) continue;
                     $val = $values[$col] ?? '';
                     $label = translate($col);
                     
-                    // Автоопределение типа поля
                     $type = 'text';
                     if (str_contains($col, '_date')) $type = 'date';
                     elseif (str_contains($col, '_time')) $type = 'time';
@@ -192,6 +244,12 @@ if ($action === 'delete' && $id && $is_logged_in) {
                     <a href="?table=<?= $table ?>"><button type="button" class="danger">Отмена</button></a>
                 </div>
             </form>
+            <?php if (!empty($errors)): ?>
+            <script>
+                alert("<?= implode('\n', array_map(fn($e) => addslashes($e), $errors)) ?>");
+            </script>
+            <?php endif; ?>
+
         <?php endif; ?>
     </div>
 
