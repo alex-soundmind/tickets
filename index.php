@@ -4,7 +4,7 @@ session_start();
 
 $is_logged_in = isset($_SESSION['user']);
 $action = $_GET['action'] ?? 'list';
-$table = $_GET['table'] ?? 'students';
+$table = $_GET['table'] ?? 'flights';
 $id = $_GET['id'] ?? null;
 
 $tables = [
