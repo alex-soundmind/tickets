@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container" style="padding: 2rem; margin-top: 5rem;">
+    <div class="container" style="min-width: 300px; margin-top: 5rem;">
         <h2><?= $page_mode === 'login' ? 'Вход в систему' : 'Создание аккаунта' ?></h2>
 
         <?php if ($error_message): ?>
