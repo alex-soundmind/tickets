@@ -44,12 +44,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_logged_in) {
 
         $value = $_POST[$col] ?? '';
 
-        // поле "информация о местах" может быть пустым
-        if ($col !== 'seat_info' && $value === '') {
-            $errors[] = "Поле '" . translate($col) . "' не может быть пустым.";
-            continue;
-        }
-
         // Проверка числовых полей
         $numericFields = ['id', 'flight_id', 'passenger_id', 'ticket_price'];
         if (in_array($col, $numericFields) && $value !== '' && !is_numeric($value)) {
