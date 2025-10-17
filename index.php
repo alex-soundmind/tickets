@@ -31,6 +31,9 @@ try {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_logged_in) {
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+        header('Content-Type: application/json; charset=utf-8');
+    }
     $data = [];
 
     foreach ($columns as $col) {
@@ -114,6 +117,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_logged_in) {
                 $stmt = $pdo->prepare("UPDATE $table SET $set_clauses WHERE $pk = ?");
                 $stmt->execute([...array_values($data), $id]);
             }
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])) {
+                echo json_encode(['success' => true]);
+                exit;
+            }
+
             header("Location: index.php?table=$table");
             exit;
         } catch (PDOException $e) {
@@ -129,7 +137,11 @@ if ($action === 'delete' && $id && $is_logged_in) {
     } catch (PDOException $e) {
         die('<p class="error">Ошибка удаления: ' . $e->getMessage() . '</p>');
     }
-    
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])) {
+        echo json_encode(['success' => true]);
+        exit;
+    }
+
     header("Location: index.php?table=$table");
     exit;
 }
@@ -208,7 +220,7 @@ if ($action === 'delete' && $id && $is_logged_in) {
             }
             ?>
             <h2><?= $action === 'create' ? 'Добавление записи' : 'Редактирование записи' ?></h2>
-            <form id="data-form" method="post" action="?table=<?= $table ?>&action=<?= $action ?><?= $id ? '&id='.$id : '' ?>">
+            <form method="post" action="?table=<?= $table ?>&action=<?= $action ?><?= $id ? '&id='.$id : '' ?>">
                 <?php foreach ($columns as $col):
                     if ($col === $pk) continue;
                     $val = $values[$col] ?? '';
@@ -231,7 +243,7 @@ if ($action === 'delete' && $id && $is_logged_in) {
                 <?php endforeach; ?>
 
                 <div class="form-actions">
-                    <input type="button" value="Сохранить" onclick="submitForm()">
+                    <input type="submit" value="Сохранить">
                     <a href="?table=<?= $table ?>"><button type="button" class="danger">Отмена</button></a>
                 </div>
             </form>
@@ -252,22 +264,32 @@ if ($action === 'delete' && $id && $is_logged_in) {
         <?php endif; ?>
     </footer>
     <script>
-        function submitForm() {
-            const form = document.getElementById('data-form');
-            const formData = new FormData(form);
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector('form');
+    if (!form) return;
 
-            fetch(form.action, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.text())
-            .then(html => {
-                document.body.innerHTML = html;
-            })
-            .catch(err => {
-                alert('Ошибка отправки формы: ' + err);
-            });
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+        const formData = new FormData(form);
+
+        const res = await fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            window.location.href = `?table=<?= $table ?>`;
+        } else if (data.errors) {
+            alert(data.errors.join('\n'));
+        } else {
+            alert('Произошла ошибка при сохранении данных.');
         }
-        </script>
+    });
+});
+</script>
+
 </body>
 </html>
