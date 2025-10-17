@@ -92,7 +92,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_logged_in) {
             continue;
         }
 
-        $data[$col] = $value;
+        $jsonFields = ['seat_info']; // JSON-поля
+
+        if (in_array($col, $jsonFields)) {
+            $data[$col] = trim($value) === '' ? '{}' : $value;
+        } else {
+            $data[$col] = $value;
+        }
+
     }
 
     if (empty($errors)) {
