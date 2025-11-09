@@ -1,9 +1,8 @@
 <?php
-$host = 'dpg-d3j56rali9vc73dorfng-a.singapore-postgres.render.com';
 $db   = 'tickets';
+$host = 'dpg-d4847mbipnbc73d8hlm0-a.singapore-postgres.render.com';
 $user = 'user';
-$pass = '0urzMvp0cvo7Oi7D2CzXEorPHYfQOwZc';
-$dsn  = "pgsql:host=$host;dbname=$db";
+$pass = 'RFa4bfOpswyRFBK3cZvaU9okEORsFxYO';
 
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
